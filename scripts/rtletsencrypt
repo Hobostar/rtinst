@@ -70,7 +70,7 @@ if [ $osname = "Debian" ]; then snap install core >> $logfile 2>&1; snap refresh
 # Installing Certbot
 if [ $(snap list | grep -c "certbot") = 0 ]; then
   echo "Installing certbot"
-  snap -y install --classic certbot >> $logfile 2>&1
+  snap install --classic certbot >> $logfile 2>&1
 else
   echo "certbot already installed"
 fi
@@ -79,6 +79,13 @@ if [ $(snap list | grep -c "certbot") = 0 ]; then
   echo "Install Failed"
   exit 1
 fi
+
+# stop the nginx service and wait for the procress to shutdown
+service nginx stop
+sleep 5
+
+# reset the configuration file before generating a certificate
+cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
 
 
 #Generating Certificates
